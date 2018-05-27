@@ -1,6 +1,6 @@
 package id.kat.pokemon
 
-import android.app.Application
+import android.support.multidex.MultiDexApplication
 import com.kat.news.deps.module.NetworkModule
 import com.kat.news.deps.module.ServiceModule
 import id.kat.pokemon.deps.component.DaggerPokeComponent
@@ -13,7 +13,7 @@ import id.kat.pokemon.deps.provider.PokeProvider
  * Email : wanhardaengmaro@gmail.com
  *
  */
-class PokeApp : Application(), PokeProvider{
+class PokeApp : MultiDexApplication(), PokeProvider{
 
     private lateinit var component: PokeComponent
 

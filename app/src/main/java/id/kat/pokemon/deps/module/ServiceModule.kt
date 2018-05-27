@@ -3,6 +3,7 @@ package com.kat.news.deps.module
 import dagger.Module
 import dagger.Provides
 import id.kat.pokemon.data.Api
+import id.kat.pokemon.service.PokeDetailService
 import id.kat.pokemon.service.PokeService
 import javax.inject.Singleton
 
@@ -18,5 +19,9 @@ open class ServiceModule{
 
     @Provides
     @Singleton
-    protected fun providesArticleService(api: Api) = PokeService(api)
+    protected fun providesPokeService(api: Api) = PokeService(api)
+
+    @Provides
+    @Singleton
+    protected fun providesPokeDetailService(api: Api) = PokeDetailService(api)
 }

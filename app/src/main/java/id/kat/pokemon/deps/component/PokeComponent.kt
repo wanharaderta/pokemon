@@ -3,6 +3,8 @@ package id.kat.pokemon.deps.component
 import com.kat.news.deps.module.NetworkModule
 import com.kat.news.deps.module.ServiceModule
 import dagger.Component
+import id.kat.pokemon.view.detail.DetailPokeFragment
+import id.kat.pokemon.view.home.HomeActivity
 import id.kat.pokemon.view.splash.SplashActivity
 import javax.inject.Singleton
 
@@ -17,4 +19,6 @@ import javax.inject.Singleton
 interface PokeComponent{
 
     fun inject(splashActivity: SplashActivity)
+    fun inject(homeActivity: HomeActivity)
+    fun inject(detailPokeFragment: DetailPokeFragment)
 }

@@ -17,6 +17,6 @@ import android.support.annotation.StringDef
 annotation class Configs
 
 object Config {
-    const val BASE_URL = "https://newsapi.org/"
-    const val API_KEY = "5dab24aff4f14b57b567608a51f8c256"
+    const val BASE_URL = "https://pokeapi.co/api/v2/"
+    const val API_KEY = ""
 }

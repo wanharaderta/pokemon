@@ -1,4 +1,6 @@
 package id.kat.pokemon.data.remote
+import com.google.gson.annotations.SerializedName
+
 
 /**
  *
@@ -6,5 +8,15 @@ package id.kat.pokemon.data.remote
  * Email : wanhardaengmaro@gmail.com
  *
  */
-class RemotePoke {
-}
+
+data class RemotePoke(
+    @SerializedName("count") var count: Int,
+    @SerializedName("previous") var previous: Any,
+    @SerializedName("results") var results: List<Result>,
+    @SerializedName("next") var next: String
+)
+
+data class Result(
+    @SerializedName("url") var url: String,
+    @SerializedName("name") var name: String
+)
