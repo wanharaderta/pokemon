@@ -37,7 +37,11 @@ class HomePresenter : Presenter<HomeView>{
 
         val disposable = service.getPokemon(21,offSet,object : NetworkCallback<RemotePoke>{
             override fun onSuccess(response: RemotePoke) {
-                view?.onSuccess(response,offSet)
+                if (offSet == 50)
+                    view?.onSuccess(response,offSet)
+                else
+                    view?.onSuccess(response,offSet)
+
             }
 
             override fun onError(e: Throwable) {

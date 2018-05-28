@@ -2,7 +2,9 @@ package id.kat.pokemon.view.home
 
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.View
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection
@@ -18,7 +20,7 @@ import kotlinx.android.synthetic.main.activity_home.*
 import org.jetbrains.anko.startActivity
 import javax.inject.Inject
 
-class HomeActivity : BaseActivity(),HomeView, SwipyRefreshLayout.OnRefreshListener {
+class HomeActivity : BaseActivity(), HomeView, SwipyRefreshLayout.OnRefreshListener {
 
 
     @Inject
@@ -26,7 +28,11 @@ class HomeActivity : BaseActivity(),HomeView, SwipyRefreshLayout.OnRefreshListen
 
     private var presenter: HomePresenter? = null
 
-    var offSet:Int = 20
+    var offSet: Int = 100
+
+    var layoutManager: LinearLayoutManager? = null
+
+    var onBottom: Boolean = false
 
     var scrollListener: EndlessRecyclerViewScrollListener? = null
 
@@ -35,22 +41,37 @@ class HomeActivity : BaseActivity(),HomeView, SwipyRefreshLayout.OnRefreshListen
         setContentView(R.layout.activity_home)
         (application as PokeProvider).providesPokeComponent().inject(this)
 
-        fun initView(){
+        fun initView() {
 
             layout_swipe_refresh.setOnRefreshListener(this)
-            layout_swipe_refresh.direction = SwipyRefreshLayoutDirection.BOTTOM
+            layout_swipe_refresh.setDistanceToTriggerSync(100)
 
-            val lm = GridLayoutManager(this,3)
+            val lm = GridLayoutManager(this, 3)
             rvPoke.layoutManager = lm
-            scrollListener = object : EndlessRecyclerViewScrollListener(lm){
+            scrollListener = object : EndlessRecyclerViewScrollListener(lm) {
                 override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
-                    progress_dialog.visibility = View.GONE
-                    layout_swipe_refresh.isRefreshing = true
-                    presenter?.getPokemon(service, offSet+21)
 
                 }
 
             }
+
+            rvPoke.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    val visibleItemCount = layoutManager?.childCount
+                    val totalItemCount = layoutManager?.itemCount
+                    val firstVisibleItemPosition = layoutManager?.findFirstVisibleItemPosition()
+
+                    if (visibleItemCount != null) {
+                        if (visibleItemCount + firstVisibleItemPosition!! >= totalItemCount!! && firstVisibleItemPosition >= 0) {
+                            Log.v("onScrolled", "true")
+                            onBottom = true
+                        } else {
+                            onBottom = false
+                        }
+                    }
+                }
+            })
 
         }
 
@@ -70,16 +91,16 @@ class HomeActivity : BaseActivity(),HomeView, SwipyRefreshLayout.OnRefreshListen
     }
 
     override fun onSuccess(response: RemotePoke, offset: Int) {
-       val data = response.results
+        val data = response.results
 
         val poke = data.map {
             val name = it?.name
             val url = it?.url
 
-            Poke(name,url,0)
+            Poke(name, url, 0)
         }
 
-        val adapter = HomeAdapter(this,poke, object : HomeListener{
+        val adapter = HomeAdapter(this, poke, object : HomeListener {
             override fun onClick(poke: Poke) {
                 presenter?.pokemonDetail(poke)
             }
@@ -90,22 +111,13 @@ class HomeActivity : BaseActivity(),HomeView, SwipyRefreshLayout.OnRefreshListen
         rvPoke.addOnScrollListener(scrollListener)
         adapter.notifyDataSetChanged()
 
-        if (offset == 1) {
-            scrollListener?.resetState()
-            offSet = 15
-        } else {
-            offSet += 15
-
-        }
-
-        fun hide(){
+        fun hide() {
             progress_dialog.visibility = android.view.View.GONE
             rvPoke.visibility = android.view.View.VISIBLE
             layout_swipe_refresh.isRefreshing = false
         }
 
         hide()
-
 
     }
 
@@ -125,9 +137,8 @@ class HomeActivity : BaseActivity(),HomeView, SwipyRefreshLayout.OnRefreshListen
     }
 
     override fun onRefresh(direction: SwipyRefreshLayoutDirection?) {
-        if (direction == SwipyRefreshLayoutDirection.BOTTOM) {
-            presenter?.getPokemon(service,50)
-        }
+        offSet += 50
+        presenter?.getPokemon(service, offSet)
     }
 
     override fun onPokeDetail(poke: Poke) {
@@ -136,8 +147,6 @@ class HomeActivity : BaseActivity(),HomeView, SwipyRefreshLayout.OnRefreshListen
         )
         this.overridePendingTransition(R.anim.abc_fade_in, R.anim.abc_fade_out)
     }
-
-
 
 
 }
