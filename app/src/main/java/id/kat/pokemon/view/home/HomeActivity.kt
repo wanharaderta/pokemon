@@ -1,6 +1,8 @@
 package id.kat.pokemon.view.home
 
+import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -146,6 +148,25 @@ class HomeActivity : BaseActivity(), HomeView, SwipyRefreshLayout.OnRefreshListe
                 "poke" to poke
         )
         this.overridePendingTransition(R.anim.abc_fade_in, R.anim.abc_fade_out)
+    }
+
+    override fun onBackPressed() {
+        showExitDialog()
+    }
+
+
+    fun showExitDialog(): AlertDialog {
+        return AlertDialog.Builder(this)
+                .setTitle(R.string.app_name)
+                .setMessage("Do you want to exit the application?")
+                .setPositiveButton("Exit", { dialog, which ->
+                    val intent = Intent(Intent.ACTION_MAIN)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    intent.addCategory(Intent.CATEGORY_HOME)
+                    this.startActivity(intent)
+                })
+                .setNegativeButton("Cancel", null)
+                .show()
     }
 
 
